@@ -1,18 +1,20 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
-// https://vite.dev/config/
+const apiTarget = process.env.CLIENT_URL || process.env.VITE_API_URL || 'http://localhost:5000'
+
 export default defineConfig({
+  envPrefix: ['VITE_', 'CLIENT_'],
   plugins: [react()],
   server: {
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: apiTarget,
         changeOrigin: true
       },
       '/uploads': {
-        target: 'http://localhost:5000',
+        target: apiTarget,
         changeOrigin: true
       }
     }
