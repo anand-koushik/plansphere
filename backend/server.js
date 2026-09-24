@@ -27,9 +27,17 @@ const app = express();
 
 const allowedOrigins = [
   process.env.CLIENT_URL,
+  process.env.FRONTEND_URL,
+  'https://plansphere-f8td.vercel.app',
   'http://localhost:5173',
   'http://127.0.0.1:5173'
 ].filter(Boolean);
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  return /https?:\/\/.*\.vercel\.app$/i.test(origin);
+};
 
 // Connect to Database
 connectDB();
@@ -37,13 +45,15 @@ connectDB();
 // Middleware
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (isAllowedOrigin(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-org-id', 'x-project-id']
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
